@@ -1,0 +1,3 @@
+id,id_asesorado,id_tutor,fecha_peticion,urgencia,id_materia,tema,descripcion,fecha_asesoria,sitio,modalidad,rechazados
+1,269314,NULL,11/11/2022,1,6,Amplificadores operacionales,No entiendo ejercicios del profesor y me va a reprobar,NULL,Biblioteca Central,1,[1]
+

@@ -1,0 +1,62 @@
+*.pdf
+*.docxtmp
+API REST/API REST Tutorias UAA/.metadata
+API REST/API REST Tutorias UAA/bin/
+API REST/API REST Tutorias UAA/tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+API REST/API REST Tutorias UAA/local.properties
+API REST/API REST Tutorias UAA/.settings/
+API REST/API REST Tutorias UAA/.loadpath
+API REST/API REST Tutorias UAA/.recommenders
+
+# External tool builders
+API REST/API REST Tutorias UAA/.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# PyDev specific (Python IDE for Eclipse)
+*.pydevproject
+
+# CDT-specific (C/C++ Development Tooling)
+API REST/API REST Tutorias UAA/.cproject
+
+# CDT- autotools
+API REST/API REST Tutorias UAA/.autotools
+
+# Java annotation processor (APT)
+API REST/API REST Tutorias UAA/.factorypath
+
+# PDT-specific (PHP Development Tools)
+API REST/API REST Tutorias UAA/.buildpath
+
+# sbteclipse plugin
+API REST/API REST Tutorias UAA/.target
+
+# Tern plugin
+API REST/API REST Tutorias UAA/.tern-project
+
+# TeXlipse plugin
+API REST/API REST Tutorias UAA/.texlipse
+
+# STS (Spring Tool Suite)
+API REST/API REST Tutorias UAA/.springBeans
+
+# Code Recommenders
+API REST/API REST Tutorias UAA/.recommenders/
+
+# Annotation Processing
+API REST/API REST Tutorias UAA/.apt_generated/
+API REST/API REST Tutorias UAA/.apt_generated_test/
+
+# Scala IDE specific (Scala & Java development for Eclipse)
+API REST/API REST Tutorias UAA/.cache-main
+API REST/API REST Tutorias UAA/.scala_dependencies
+API REST/API REST Tutorias UAA/.worksheet
+
+# Uncomment this line if you wish to ignore the project description file.
+# Typically, this file would be tracked if it contains build/dependency configurations:
+#.project

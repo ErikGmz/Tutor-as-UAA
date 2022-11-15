@@ -1,0 +1,49 @@
+POST: api/registrarAlumno/:info -> 
+Da de alta a un alumno. Recibe un
+arreglo con toda su información
+en json.
+
+
+GET: api/infoAlumno/:id -> Nos regresa
+toda la información del alumno
+con el id del parámetro
+
+GET: api/materias/:semestre -> Nos regresa
+las materias existentes de un semestre
+
+GET: api/materia/:id_materia -> Nos regresa la información
+de una sola materia
+
+POST: api/mandarSolicitud/:info -> Crea
+una nueva solicitud con la información
+requerida
+
+NOTA: PANTALLA "EN PROCESO" DE ALUMNO ASESORADO. EN ESTA PANTALLA
+ESTARÁN LAS SOLICITUDES QUE AÚN NO TENGAN RESPUESTA
+DE NINGÚN TUTOR O BIEN QUE SI HAYA UN TUTOR INTERESADO, 
+PERO TODAVÍA NO SE ESTABLEZCA UNA FECHA PARA LA ASESORÍA
+
+GET: api/solicitudes/:id_alumno  -> Nos regresa
+todas las solicitudes que un alumno haya hecho
+
+DELETE: api/borrarSolicitud/:id_solicitud -> Borra el registro de la 
+solicitud enviada como parámetro
+
+UPDATE: api/modificarSolicitud/:info -> Modifica el registro
+de la solicitud con la información enviada
+
+
+PARTE DEL TUTOR:
+POST: api/registrarTutor/:info ->
+Da de alta a un tutor. Receibe un 
+arreglo con toda la informació en json.
+
+GET: api/todasMaterias/ -> Regresa
+todas las materias habidas y por haber
+en la tabla de materias
+
+
+GET: api/todasSolicitudes/ -> Regresa
+todas las solicitudes existentes
+
+

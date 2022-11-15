@@ -1,0 +1,5 @@
+id,nombre,apellidos,semestre,telefono,correo,contrasena,imagen
+269314,Eduardo,Davila Campos,7,4499205022,ed@,1234,http://hola.jpg
+226582,Cynthia Maritza, Terán Carranza,2,4499205022,ed@,1234,http://hola.jpg
+392929,Carlos Alberto,Sánchez Rodríguez,7,449993439,ed@,1234,http://hola.jpg
+152410,Abel,Soto Valdez,7,449920292,ed@,1234,http://hola.jpg
