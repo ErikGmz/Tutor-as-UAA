@@ -3,17 +3,18 @@ package com.tutorias.uaa.archivos;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.tutorias.uaa.modelos.Alumno;
+import com.tutorias.uaa.modelos.Materia;
+import com.tutorias.uaa.modelos.SolicitudSimplificada;
+import com.tutorias.uaa.modelos.TutorSimplificado;
 
 public class ArchivoJson {
 	//---Constructor---//.
@@ -22,25 +23,67 @@ public class ArchivoJson {
 	}
 	
 	//---Métodos---//.
-	public static <T, K> Map<T, K> obtenerRegistros(String nombreArchivo) {
+	public static <K> Map<Integer, K> obtenerRegistros(String nombreArchivo, K auxiliar) {
 		try {
 			//Verificar si el archivo especificado es válido.
 			if(!archivoValido(nombreArchivo)) {
-				throw new IOException();
+				return null;
 			}
 			
-			//Definir los parámetros para la lectura de
-			//datos registrados en el archivo correspondiente.
-			Reader lector = Files.newBufferedReader(Paths.get(nombreArchivo));
+			//Convertir la cadena JSON a un objeto Java.
+			try {
+				ObjectMapper mapeador = new ObjectMapper();
+				Map<Integer, K> objetos = mapeador.readValue(Paths.get(nombreArchivo).toFile(), 
+				mapeador.getTypeFactory().constructMapType(Map.class, Integer.class, auxiliar.getClass()));
+				
+				if(objetos != null) {
+					return objetos;
+				}
+				else {
+					return null;
+				}
+			}
+			catch(MismatchedInputException e) {
+				return null;
+			}
+		} 
+		catch(FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static <K> K obtenerRegistroEspecifico(String nombreArchivo, Integer indiceRegistro, K auxiliar) {
+		try {
+			//Verificar si el archivo especificado es válido.
+			if(!archivoValido(nombreArchivo)) {
+				return null;
+			}
 			
 			//Convertir la cadena JSON a un objeto Java.
-			Gson gson = new Gson();
-			Type listaObjetos = new TypeToken<ArrayList<K>>() {}.getType();
-			
-			Map<T, K> objetos = gson.fromJson(lector, listaObjetos);
-			lector.close();
-			
-			return objetos;
+			try {
+				ObjectMapper mapeador = new ObjectMapper();
+				Map<Integer, K> objetos = mapeador.readValue(Paths.get(nombreArchivo).toFile(), 
+				mapeador.getTypeFactory().constructMapType(Map.class, Integer.class, auxiliar.getClass()));
+				
+				if(objetos != null) {		
+					return objetos.get(indiceRegistro);
+				}
+				else {
+					return null;
+				}
+			}
+			catch(MismatchedInputException e) {
+				return null;
+			}
 		} 
 		catch(FileNotFoundException e) {
 			e.printStackTrace();
@@ -52,51 +95,27 @@ public class ArchivoJson {
 		}
 	}
 	
-	public static <T, K> K obtenerRegistroEspecifico(String nombreArchivo, T indiceRegistro) {
+	public static <K> boolean agregarRegistro(String nombreArchivo, Integer indiceRegistro, K registro) {
 		try {
 			//Verificar si el archivo especificado es válido.
 			if(!archivoValido(nombreArchivo)) {
-				throw new IOException();
+				//Crear el archivo previamente inexistente.
+				File archivo = new File(nombreArchivo);
+				
+				if(!archivo.exists()) {
+					if(!archivo.createNewFile()) {
+						return false;
+					}
+				}
 			}
 			
-			//Definir los parámetros para la lectura de
-			//datos registrados en el archivo correspondiente.
-			Reader lector = Files.newBufferedReader(Paths.get(nombreArchivo));
+			Map<Integer, K> auxiliar = obtenerRegistros(nombreArchivo, registro);
+			HashMap<Integer, K> listaRegistros = (HashMap<Integer, K>) auxiliar;
 			
-			//Convertir la cadena JSON a un objeto Java.
-			Gson gson = new Gson();
-			Type listaObjetos = new TypeToken<ArrayList<K>>() {}.getType();
-			
-			Map<T, K> objetos = gson.fromJson(lector, listaObjetos);
-			lector.close();
-			
-			return objetos.get(indiceRegistro);
-		} 
-		catch(FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	public static <T, K> boolean agregarRegistro(String nombreArchivo, T indiceRegistro, K registro) {
-		try {
-			//Verificar si el archivo especificado es válido.
-			if(!archivoValido(nombreArchivo)) {
-				throw new Exception();
+			if(listaRegistros == null) {
+				listaRegistros = new HashMap<>();
 			}
-			
-			Map<T, K> auxiliar = obtenerRegistros(nombreArchivo);
-			HashMap<T, K> listaRegistros = (HashMap<T, K>) auxiliar;
-			
-			//Verificar si existen datos en el archivo especificado.
-			if(!listadoValido(listaRegistros)) {
-				return false;
-			}
-			
+						
 			//Verificar si el registro ya existe en la base de datos.
 			if(listaRegistros.containsKey(indiceRegistro)) {
 				return false;
@@ -104,7 +123,7 @@ public class ArchivoJson {
 			
 			//Agregar el registro al correspondiente archivo.
 			listaRegistros.put(indiceRegistro, registro);
-			return sobreescribirArchivo(nombreArchivo, listaRegistros);
+			return sobreescribirArchivo(nombreArchivo, listaRegistros, registro);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -112,45 +131,15 @@ public class ArchivoJson {
 		}
 	}
 	
-	public static <T, K> boolean actualizarRegistro(String nombreArchivo, T indiceRegistro, K registroNuevo) {
+	public static <K> boolean actualizarRegistro(String nombreArchivo, Integer indiceRegistro, K registroNuevo) {
 		try {
 			//Verificar si el archivo especificado es válido.
 			if(!archivoValido(nombreArchivo)) {
-				throw new Exception();
-			}
-			
-			Map<T, K> auxiliar = obtenerRegistros(nombreArchivo);
-			HashMap<T, K> listaRegistros = (HashMap<T, K>) auxiliar;
-			
-			//Verificar si existen datos en el archivo especificado.
-			if(!listadoValido(listaRegistros)) {
 				return false;
 			}
 			
-			//Verificar si el registro realmente existe en la base de datos.
-			if(!listaRegistros.containsKey(indiceRegistro)) {
-				return false;
-			}
-			
-			//Actualizar el correspondiente registro.
-			listaRegistros.replace(indiceRegistro, registroNuevo);
-			return sobreescribirArchivo(nombreArchivo, listaRegistros);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public static <T, K> boolean eliminarRegistro(String nombreArchivo, T indiceRegistro) {
-		try {
-			//Verificar si el archivo especificado es válido.
-			if(!archivoValido(nombreArchivo)) {
-				throw new Exception();
-			}
-			
-			Map<T, K> auxiliar = obtenerRegistros(nombreArchivo);
-			HashMap<T, K> listaRegistros = (HashMap<T, K>) auxiliar;
+			Map<Integer, K> auxiliar = obtenerRegistros(nombreArchivo, registroNuevo);
+			HashMap<Integer, K> listaRegistros = (HashMap<Integer, K>) auxiliar;
 			
 			//Verificar si existen datos en el archivo especificado.
 			if(!listadoValido(listaRegistros)) {
@@ -164,7 +153,50 @@ public class ArchivoJson {
 			
 			//Actualizar el correspondiente registro.
 			listaRegistros.remove(indiceRegistro);
-			return sobreescribirArchivo(nombreArchivo, listaRegistros);
+			
+			if(registroNuevo instanceof Alumno) {
+				listaRegistros.put(((Alumno) registroNuevo).getID(), registroNuevo);
+			}
+			if(registroNuevo instanceof Materia) {
+				listaRegistros.put(((Materia) registroNuevo).getID(), registroNuevo);
+			}
+			if(registroNuevo instanceof TutorSimplificado) {
+				listaRegistros.put(((TutorSimplificado) registroNuevo).getID(), registroNuevo);
+			}
+			if(registroNuevo instanceof SolicitudSimplificada) {
+				listaRegistros.put(((SolicitudSimplificada) registroNuevo).getID(), registroNuevo);
+			}
+			return sobreescribirArchivo(nombreArchivo, listaRegistros, registroNuevo);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public static <K> boolean eliminarRegistro(String nombreArchivo, Integer indiceRegistro, K parametroAuxiliar) {
+		try {
+			//Verificar si el archivo especificado es válido.
+			if(!archivoValido(nombreArchivo)) {
+				return false;
+			}
+			
+			Map<Integer, K> auxiliar = obtenerRegistros(nombreArchivo, parametroAuxiliar);
+			HashMap<Integer, K> listaRegistros = (HashMap<Integer, K>) auxiliar;
+			
+			//Verificar si existen datos en el archivo especificado.
+			if(!listadoValido(listaRegistros)) {
+				return false;
+			}
+			
+			//Verificar si el registro realmente existe en la base de datos.
+			if(!listaRegistros.containsKey(indiceRegistro)) {
+				return false;
+			}
+			
+			//Actualizar el correspondiente registro.
+			listaRegistros.remove(indiceRegistro);
+			return sobreescribirArchivo(nombreArchivo, listaRegistros, parametroAuxiliar);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -183,7 +215,7 @@ public class ArchivoJson {
 		}
 	}
 	
-	public static <T, K> boolean listadoValido(Map<T, K> listado) {
+	public static <K> boolean listadoValido(Map<Integer, K> listado) {
 		try {
 			if(listado == null) {
 				return false;
@@ -215,7 +247,7 @@ public class ArchivoJson {
 		}
 	}
 	
-	public static <T, K> boolean sobreescribirArchivo(String nombreArchivo, Map<T, K> listaRegistros) {
+	public static <K> boolean sobreescribirArchivo(String nombreArchivo, Map<Integer, K> listaRegistros, K auxiliar) {
 		try {
 			//Verificar si el archivo especificado es válido.
 			if(!archivoValido(nombreArchivo)) {
@@ -226,16 +258,12 @@ public class ArchivoJson {
 			if(!eliminarArchivo(nombreArchivo)) {
 				throw new Exception();
 			}
-			
-			//Definir los datos para efectuar la
-			//sobreescritura del archivo.
-			Writer escritor = Files.newBufferedWriter(Paths.get(nombreArchivo));
-			
-			//Serializar en forma de cadena JSON todos los datos
-			//y utilizarla para generar un archivo nuevo.
-			Gson gson = new Gson();
-			gson.toJson(listaRegistros, escritor);
-			
+							
+			//Generar la cadena JSON con todos los datos correspondientes
+			//y utilizarla para sobreescribir el archivo.
+			ObjectMapper mapeador = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+			mapeador.writeValue(Paths.get(nombreArchivo).toFile(), listaRegistros.entrySet().stream()
+			.sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 			return true;
 		}
 		catch(FileNotFoundException e) {

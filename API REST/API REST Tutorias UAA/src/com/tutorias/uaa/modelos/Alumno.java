@@ -38,7 +38,7 @@ public class Alumno {
 	public void setSemestre(int semestre) { this.semestre = semestre; }
 	public void setTelefono(String telefono) { this.telefono = telefono; }
 	public void setCorreo(String correo) { this.correo = correo; }
-	public void setClave(String clave) { this.clave = clave; }
+	public void setClave(String clave) { this.clave = encriptadoMD5(clave); }
 	public void setImagen(String imagen) { this.imagen = imagen; }
 	
 	//---Constructores---//.
