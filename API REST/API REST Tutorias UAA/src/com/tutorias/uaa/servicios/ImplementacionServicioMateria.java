@@ -203,19 +203,24 @@ public class ImplementacionServicioMateria implements ServicioMateria {
 			//Actualizar los tutores con el ID de la materia actualizada.
 			Map<Integer, TutorSimplificado> registrosTutores = ArchivoJson.<TutorSimplificado>obtenerRegistros(ImplementacionServicioTutor.nombreArchivo, new TutorSimplificado());
 			
-			registrosTutores.forEach((indice, valor) -> {
-				valor.getIDsMateriasAsesorias().replaceAll(valorID -> valorID == IDReferencia ? IDNuevo : valorID);
-			});
-			ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
-					
+			if(registrosTutores != null) {
+				registrosTutores.forEach((indice, valor) -> {
+					valor.getIDsMateriasAsesorias().replaceAll(valorID -> valorID == IDReferencia ? IDNuevo : valorID);
+				});
+				ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
+			}
+			
 			//Actualizar las solicitudes con el ID de la materia actualizada.
 			Map<Integer, SolicitudSimplificada> registrosSolicitudes = ArchivoJson.<SolicitudSimplificada>obtenerRegistros(ImplementacionServicioSolicitud.nombreArchivo, new SolicitudSimplificada());
-			registrosSolicitudes.forEach((indice, valor) -> {
-				if(valor.getMateriaAsesoria() == IDReferencia) {
-					valor.setMateriaAsesoria(IDNuevo);
-				}
-			});
-			ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+			
+			if(registrosSolicitudes != null) {
+				registrosSolicitudes.forEach((indice, valor) -> {
+					if(valor.getMateriaAsesoria() == IDReferencia) {
+						valor.setMateriaAsesoria(IDNuevo);
+					}
+				});
+				ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+			}
 		}
 	}
 	
@@ -223,14 +228,19 @@ public class ImplementacionServicioMateria implements ServicioMateria {
 		//Actualizar los tutores con el ID de la materia eliminada.
 		Map<Integer, TutorSimplificado> registrosTutores = ArchivoJson.<TutorSimplificado>obtenerRegistros(ImplementacionServicioTutor.nombreArchivo, new TutorSimplificado());
 		
-		registrosTutores.forEach((indice, valor) -> {
-			valor.getIDsMateriasAsesorias().removeAll(Arrays.asList(ID));
-		});
-		ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
-						
+		if(registrosTutores != null) {
+			registrosTutores.forEach((indice, valor) -> {
+				valor.getIDsMateriasAsesorias().removeAll(Arrays.asList(ID));
+			});
+			ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
+		}
+					
 		//Eliminar las solicitudes con el ID de la materia eliminada.
 		Map<Integer, SolicitudSimplificada> registrosSolicitudes = ArchivoJson.<SolicitudSimplificada>obtenerRegistros(ImplementacionServicioSolicitud.nombreArchivo, new SolicitudSimplificada());
-		registrosSolicitudes.entrySet().removeIf(registro -> registro.getValue().getMateriaAsesoria() == ID);
-		ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+		
+		if(registrosSolicitudes != null) {
+			registrosSolicitudes.entrySet().removeIf(registro -> registro.getValue().getMateriaAsesoria() == ID);
+			ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+		}
 	}
 }

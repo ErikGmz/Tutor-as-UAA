@@ -280,25 +280,31 @@ public class ImplementacionServicioTutor implements ServicioTutor {
 		if(IDReferencia != IDNuevo) {	
 			//Actualizar las solicitudes con el ID del tutor actualizado.
 			Map<Integer, SolicitudSimplificada> registrosSolicitudes = ArchivoJson.<SolicitudSimplificada>obtenerRegistros(ImplementacionServicioSolicitud.nombreArchivo, new SolicitudSimplificada());
-			registrosSolicitudes.forEach((indice, valor) -> {
-				if(valor.getTutorAsesorias() == IDReferencia) {
-					valor.setTutorAsesorias(IDNuevo);
-				}
-				valor.getTutoresNoDisponibles().replaceAll(valorID -> valorID == IDReferencia ? IDNuevo : valorID);
-			});
-			ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+			
+			if(registrosSolicitudes != null) {
+				registrosSolicitudes.forEach((indice, valor) -> {
+					if(valor.getTutorAsesorias() == IDReferencia) {
+						valor.setTutorAsesorias(IDNuevo);
+					}
+					valor.getTutoresNoDisponibles().replaceAll(valorID -> valorID == IDReferencia ? IDNuevo : valorID);
+				});
+				ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+			}
 		}
 	}
 	
 	private void eliminarRegistrosTutor(int ID) throws Exception {
 		//Actualizar las solicitudes con el ID del tutor actualizado.
 		Map<Integer, SolicitudSimplificada> registrosSolicitudes = ArchivoJson.<SolicitudSimplificada>obtenerRegistros(ImplementacionServicioSolicitud.nombreArchivo, new SolicitudSimplificada());
-		registrosSolicitudes.forEach((indice, valor) -> {
-			if(valor.getTutorAsesorias() == ID) {
-				valor.setTutorAsesorias(0);
-			}
-			valor.getTutoresNoDisponibles().removeIf(valorID -> valorID == ID);
-		});
-		ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+		
+		if(registrosSolicitudes != null) {
+			registrosSolicitudes.forEach((indice, valor) -> {
+				if(valor.getTutorAsesorias() == ID) {
+					valor.setTutorAsesorias(0);
+				}
+				valor.getTutoresNoDisponibles().removeIf(valorID -> valorID == ID);
+			});
+			ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+		}
 	}
 }

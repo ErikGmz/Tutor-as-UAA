@@ -186,46 +186,65 @@ public class ImplementacionServicioAlumno implements ServicioAlumno {
 			//Actualizar los tutores con el ID del alumno eliminado.
 			Map<Integer, TutorSimplificado> registrosTutores = ArchivoJson.<TutorSimplificado>obtenerRegistros(ImplementacionServicioTutor.nombreArchivo, new TutorSimplificado());
 			
-			registrosTutores.forEach((indice, valor) -> {
-				if(valor.getIDAlumnoAsesorias() == IDReferencia) {
-					valor.setIDAlumnoAsesorias(IDNuevo);
-				}
-			});
-			ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
-					
+			if(registrosTutores != null) {
+				registrosTutores.forEach((indice, valor) -> {
+					if(valor.getIDAlumnoAsesorias() == IDReferencia) {
+						valor.setIDAlumnoAsesorias(IDNuevo);
+					}
+				});
+				ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
+			}
+			
 			//Actualizar las solicitudes con el ID del alumno eliminado.
 			Map<Integer, SolicitudSimplificada> registrosSolicitudes = ArchivoJson.<SolicitudSimplificada>obtenerRegistros(ImplementacionServicioSolicitud.nombreArchivo, new SolicitudSimplificada());
-			registrosSolicitudes.forEach((indice, valor) -> {
-				if(valor.getAlumnoAsesorado() == IDReferencia) {
-					valor.setAlumnoAsesorado(IDNuevo);
-				}
-			});
-			ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+			
+			if(registrosSolicitudes != null) {
+				registrosSolicitudes.forEach((indice, valor) -> {
+					if(valor.getAlumnoAsesorado() == IDReferencia) {
+						valor.setAlumnoAsesorado(IDNuevo);
+					}
+				});
+				ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+			}
+			
 		}
 	}
 	
 	private void eliminarRegistrosAlumno(int ID) throws Exception {
 		//Eliminar los tutores con el ID del alumno eliminado.
 		Map<Integer, TutorSimplificado> registrosTutores = ArchivoJson.<TutorSimplificado>obtenerRegistros(ImplementacionServicioTutor.nombreArchivo, new TutorSimplificado());
-		List<Integer> tutoresEliminados = registrosTutores.entrySet().stream()
-		.filter(valor -> valor.getValue().getIDAlumnoAsesorias() == ID)
-		.map(Map.Entry::getKey)
-		.collect(Collectors.toList());
+		List<Integer> tutoresEliminados;
 		
-		registrosTutores.entrySet().removeIf(registro -> registro.getValue().getIDAlumnoAsesorias() == ID);
-		ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
-				
+		if(registrosTutores != null) {
+			tutoresEliminados = registrosTutores.entrySet().stream()
+			.filter(valor -> valor.getValue().getIDAlumnoAsesorias() == ID)
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toList());
+			
+			registrosTutores.entrySet().removeIf(registro -> registro.getValue().getIDAlumnoAsesorias() == ID);
+			ArchivoJson.<TutorSimplificado>sobreescribirArchivo(ImplementacionServicioTutor.nombreArchivo, registrosTutores, new TutorSimplificado());
+		}
+		else {
+			tutoresEliminados = null;
+		}
+			
 		//Eliminar las solicitudes con el ID del alumno eliminado.
 		Map<Integer, SolicitudSimplificada> registrosSolicitudes = ArchivoJson.<SolicitudSimplificada>obtenerRegistros(ImplementacionServicioSolicitud.nombreArchivo, new SolicitudSimplificada());
-		registrosSolicitudes.entrySet().removeIf(registro -> registro.getValue().getAlumnoAsesorado() == ID);
 		
-		//Actualizar las solicitudes con el ID del tutor relacionado con el alumno eliminado.
-		registrosSolicitudes.forEach((indice, valor) -> {
-			if(tutoresEliminados.contains(valor.getTutorAsesorias())) {
-				valor.setTutorAsesorias(0);
+		if(registrosSolicitudes != null) {
+			registrosSolicitudes.entrySet().removeIf(registro -> registro.getValue().getAlumnoAsesorado() == ID);
+			
+			//Actualizar las solicitudes con el ID del tutor relacionado con el alumno eliminado.
+			if(registrosTutores != null) {
+				registrosSolicitudes.forEach((indice, valor) -> {
+					if(tutoresEliminados.contains(valor.getTutorAsesorias())) {
+						valor.setTutorAsesorias(0);
+					}
+					valor.getTutoresNoDisponibles().removeAll(tutoresEliminados);
+				});
 			}
-			valor.getTutoresNoDisponibles().removeAll(tutoresEliminados);
-		});
-		ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+			
+			ArchivoJson.<SolicitudSimplificada>sobreescribirArchivo(ImplementacionServicioSolicitud.nombreArchivo, registrosSolicitudes, new SolicitudSimplificada());
+		}
 	}
 }
